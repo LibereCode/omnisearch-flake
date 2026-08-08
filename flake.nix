@@ -7,11 +7,10 @@
   };
 
   outputs =
-    inputs@{
-      self,
-      nixpkgs,
-      flake-parts,
-      ...
+    inputs@{ self
+    , nixpkgs
+    , flake-parts
+    , ...
     }:
     flake-parts.lib.mkFlake { inherit inputs; } {
       systems = [
@@ -33,11 +32,10 @@
       };
 
       flake.nixosModules.default =
-        {
-          config,
-          lib,
-          pkgs,
-          ...
+        { config
+        , lib
+        , pkgs
+        , ...
         }:
         let
           cfg = config.services.omnisearch;

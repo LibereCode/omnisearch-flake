@@ -1,19 +1,24 @@
-{
-  stdenv,
-  libxml2,
-  curl,
-  openssl,
-  git,
-
-  #TEST: temp
-  lib,
+{ stdenv
+, libxml2
+, curl
+, openssl
+, git
+, lib
+,
 }:
 let
+  inherit (lib) platforms;
+  inherit (builtins) fetchurl;
+
   repoURLBase = "https://git.bwaaa.monster";
+  unChangeLICENSE = fetchurl {
+    url = "https://git.bwaaa.monster/omnisearch/plain/LICENSE";
+    sha256 = "1i86m5vk5na9ya6hcci4z1p9riizls1fanpb9z5l810qm1i7062q";
+  };
 
   beaker = stdenv.mkDerivation rec {
     pname = "beaker";
-    version = "360d6271e1a20d128430e52637d5d35f4c706ca5"; # "360d627";
+    version = "360d6271e1a20d128430e52637d5d35f4c706ca5";
 
     src = fetchGit {
       url = "${repoURLBase}/${pname}";
@@ -34,12 +39,11 @@ let
 in
 stdenv.mkDerivation rec {
   pname = "omnisearch";
-  version = "499bb9b1268cd422619efdc46889960425462aae"; # "9c68a8a";
+  version = "499bb9b1268cd422619efdc46889960425462aae";
 
   src = fetchGit {
     url = "${repoURLBase}/${pname}";
     rev = version;
-    # rev = "9c68a8ae6fb32f8a1660da392b9985a4ab3e7cb4";
   };
 
   buildInputs = [
@@ -77,7 +81,7 @@ stdenv.mkDerivation rec {
 
   meta = {
     description = "Lightweight metasearch engine in C";
-    platforms = lib.platforms.linux;
-    license = [ ../omnisearch.LICENSE ]; # TEST:
+    platforms = platforms.linux;
+    license = [ unChangeLICENSE ];
   };
 }
