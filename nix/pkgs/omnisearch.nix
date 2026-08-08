@@ -10,19 +10,21 @@ let
   inherit (lib) platforms;
   inherit (builtins) fetchurl;
 
-  repoURLBase = "https://git.bwaaa.monster";
+  pname = "omnisearch";
+  gitHostURL = "https://git.bwaaa.monster";
+  omnisearchRepoURL = "${gitHostURL}/omnisearch";
   unChangeLICENSE = fetchurl {
-    url = "https://git.bwaaa.monster/omnisearch/plain/LICENSE";
+    url = "${omnisearchRepoURL}/plain/LICENSE";
     sha256 = "1i86m5vk5na9ya6hcci4z1p9riizls1fanpb9z5l810qm1i7062q";
   };
 
   beaker = stdenv.mkDerivation rec {
     pname = "beaker";
-    version = "360d6271e1a20d128430e52637d5d35f4c706ca5";
+    version = "360d627";
 
     src = fetchGit {
-      url = "${repoURLBase}/${pname}";
-      rev = version;
+      url = "${gitHostURL}/beaker";
+      rev = "${version}1e1a20d128430e52637d5d35f4c706ca5";
     };
 
     buildPhase = /* sh */ ''
@@ -93,12 +95,12 @@ let
     '';
 in
 stdenv.mkDerivation rec {
-  pname = "omnisearch";
-  version = "499bb9b1268cd422619efdc46889960425462aae";
+  inherit pname;
+  version = "499bb9b";
 
   src = fetchGit {
-    url = "${repoURLBase}/${pname}";
-    rev = version;
+    url = "${gitHostURL}/${pname}";
+    rev = "${version}1268cd422619efdc46889960425462aae";
   };
 
   buildInputs = [
