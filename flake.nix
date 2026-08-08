@@ -1,5 +1,8 @@
 {
-  description = "A very basic flake";
+  description = ''
+    Unofficial nix-flake-wrapper of the
+    web meta-search engine **omnisearch**.
+  '';
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable";
