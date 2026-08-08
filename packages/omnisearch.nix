@@ -1,16 +1,19 @@
-{
-  stdenv,
-  libxml2,
-  curl,
-  openssl,
-  git,
-  lib,
-  bashNonInteractive,
+{ stdenv
+, libxml2
+, curl
+, openssl
+, git
+, lib
+, bashNonInteractive
+, ## used in pkgs.omnisearch.overrides {};
+  configINIOverrides ? { }
+, # configINIExtra ? "", # prolly dumb
 }:
 let
   inherit (lib) platforms;
   inherit (builtins) fetchurl;
   bash = "${bashNonInteractive}/bin/bash";
+  inherit (lib.generators) toINI;
 
   pname = "omnisearch";
   gitHostURL = "https://git.bwaaa.monster";
@@ -41,53 +44,59 @@ let
     ];
   };
 
-  #FIXME: groups/users -- instead be in options-config
-  # omnisearchService = # dosini
-  #   ''
-  #     [Unit]
-  #     Description=Omnisearch Web Search Server
-  #     After=network.target
-  #
-  #     [Service]
-  #     Type=simple
-  #     User=omnisearch
-  #     Group=omnisearch
-  #     WorkingDirectory=$out/etc/omnisearch
-  #     ExecStart=$out/bin/omnisearch
-  #     Restart=always
-  #     RestartSec=5
-  #     PrivateTmp=yes
-  #     NoNewPrivileges=yes
-  #
-  #     [Install]
-  #     WantedBy=multi-user.target
-  #   '';
-  #TODO: have the systemd-service in options-config instead
-  #TEST: reference of Makefile install-systemd
-  # PREFIX      ?= /usr
-  # DATA_DIR    ?= /etc/omnisearch
-  # CONF_DIR    ?= /etc/omnisearch
-  # VAR_DIR     ?= /var/lib/omnisearch
-  # LOG_DIR     ?= /var/log/omnisearch
-  # CACHE_DIR   ?= /var/cache/omnisearch
-  # install-systemd: $(TARGET)
-  #   @mkdir -p $(DATA_DIR)/templates $(DATA_DIR)/static $(DATA_DIR)/locales $(LOG_DIR) $(CACHE_DIR)
-  #   @cp -rf templates/* $(DATA_DIR)/templates/
-  #   @cp -rf static/* $(DATA_DIR)/static/
-  #   @cp -rf locales/* $(DATA_DIR)/locales/
-  #   @cp -n example-config.ini $(DATA_DIR)/config.ini || true
-  #   install -m 755 $(TARGET) $(INSTALL_BIN_DIR)/omnisearch
-  #   @echo "Setting up user '$(USER)'..."
-  #   @(grep -q '^$(GROUP):' /etc/group || groupadd $(GROUP)) 2>/dev/null || true
-  #   @id -u $(USER) >/dev/null 2>&1 || useradd --system --home $(DATA_DIR) --shell /usr/sbin/nologin -g $(GROUP) $(USER)
-  #   @chown -R $(USER):$(GROUP) $(LOG_DIR) $(CACHE_DIR) $(VAR_DIR) $(DATA_DIR) 2>/dev/null || true
-  #   @chown $(USER):$(GROUP) $(DATA_DIR)/config.ini 2>/dev/null || true
-  #   install -m 644 init/systemd/omnisearch.service $(SYSTEMD_DIR)/omnisearch.service
-  #   @echo ""
-  #   @echo "Config: $(DATA_DIR)/config.ini"
-  #   @echo "Edit config with: nano $(DATA_DIR)/config.ini"
-  #   @echo "Installed systemd service to $(SYSTEMD_DIR)/omnisearch.service"
-  #   @echo "Run 'systemctl enable --now omnisearch' to start"
+  #INFO: These are default values + few overrides from example-config.ini.
+  ## Just use .override if you want to change
+  configINI = toINI { } (
+    {
+      server = {
+        host = "0.0.0.0";
+        port = 8087;
+        ## default locale (default: "en_gb")
+        #locale = "en_gb";
+      };
+      proxy = {
+        ## single proxy, or ...
+        proxy = null; # ''"socks5://127.0.0.1:9050"'';
+
+        ## ... a proxy file (path as a string, do not source it)
+        list_file = null; # path/to/file;
+
+        max_retries = 3;
+
+        ## Randomize proxy credentials for each request
+        randomize_username = true;
+        randomize_password = true;
+      };
+      cache = {
+        ## Directory to store cached responses
+        dir = "/var/cache/omnisearch"; # "/tmp/omnisearch_cache";
+
+        ## Cache TTL for search results in seconds (default: 3600 = 1 hour)
+        ttl_search = 3600;
+
+        ## Cache TTL for infobox data in seconds (default: 86400 = 24 hours)
+        ttl_infobox = 86400;
+      };
+      engines = {
+        ## Use * for all engines, or specify comma-separated list (e.g., ddg,yahoo)
+        ## Use *,-engine to exclude specific engines (e.g., *,-startpage)
+        ## Available engines: ddg, startpage, yahoo, mojeek
+        engines = ''"*"'';
+      };
+      rate_limit = {
+        ## Rate limit searches per interval
+
+        ## /search
+        #search_requests = 10;
+        #search_interval = 60;
+
+        ## /images
+        #images_requests = 20;
+        #images_interval = 60;
+      };
+    }
+    // configINIOverrides
+  );
 
   #XXX: A hack, but it works...
   omnisearchRun = # sh
@@ -141,12 +150,16 @@ stdenv.mkDerivation rec {
     # install -Dm755 bin/omnisearch $out/bin/omnisearch
     install -Dm755 bin/omnisearch $out/share/omnisearch/omnisearch
     cp -r $src/{templates,static,locales} -t $out/share/omnisearch/
-    install -Dm644 example-config.ini $out/share/omnisearch/config.ini
 
     cat << EOF > omnisearch-run.sh
     ${omnisearchRun}
     EOF
     install -Dm755 omnisearch-run.sh $out/bin/omnisearch-run
+
+    cat << EOF > generated-config.ini
+    ${configINI}
+    EOF
+    install -Dm644 generated-config.ini $out/share/omnisearch/config.ini
 
     #TEST: temp
     cp -r $src/ $out/temp-src

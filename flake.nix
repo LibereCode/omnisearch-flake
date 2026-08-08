@@ -21,7 +21,7 @@
       perSystem =
         { pkgs, self', ... }:
         {
-          packages.omnisearch = pkgs.callPackage ./nix/pkgs/omnisearch.nix { };
+          packages.omnisearch = pkgs.callPackage ./packages/omnisearch.nix { };
           packages.default = self'.packages.omnisearch;
 
           formatter = pkgs.nixpkgs-fmt;
@@ -33,6 +33,6 @@
         };
       };
 
-      flake.nixosModules.default = import ./nix/module/omnisearch.nix;
+      flake.nixosModules.default = import ./modules/default.nix;
     };
 }
