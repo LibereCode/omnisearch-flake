@@ -24,6 +24,7 @@ let
   };
 
   beaker = stdenv.mkDerivation rec {
+    name = "${pname}-${version}";
     pname = "beaker";
     version = "360d627";
 
@@ -108,6 +109,7 @@ let
     '';
 in
 stdenv.mkDerivation rec {
+  name = "${pname}-${version}";
   inherit pname;
   version = "499bb9b";
 

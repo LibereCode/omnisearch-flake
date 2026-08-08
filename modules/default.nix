@@ -1,4 +1,5 @@
 { self
+, self'
 , config
 , lib
 , pkgs
@@ -6,7 +7,8 @@
 }:
 let
   cfg = config.services.omnisearch;
-  pkg = pkgs.omnisearch;
+  # pkg = pkgs.omnisearch;
+  pkg = self'.packages.omnisearch;
   iniType = pkgs.formats.ini.type;
   inherit (lib)
     literalMD

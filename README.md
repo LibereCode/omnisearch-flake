@@ -5,51 +5,52 @@
 
 I have also a better nix implementation either way... :P
 
+> [!WARN]
+> `services.omnisearch` does NOT work yet, so just use the package for now...
+
 ## USAGE
 
 ```nix flake.nix
+# flake.nix
 {
   inputs = {
     # ... other inputs
 
     omnisearch-flake = {
-      url = "github:LibereCode/omnisearch-flake";
+      url = "github:liberecode/omnisearch-flake";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
     # ... other inputs
   };
 
-  outputs = inputs @ { args, ... }:
-    {
+  outputs = {
     # ... other output-stuff
+  };
+}
+```
 
-      nixosConfigurations.hostname = inputs.nixpkgs.lib.nixosSystem {
-        # ... config
+```nix modules/nixos/omnisearch.nix
+# modules/nixos/omnisearch.nix
+## need to be imported!
+{ inputs, ... }: {
 
-        modules = [
-          ## allow you to use the package and
-          ## the nixos-options `services.omnisearch.<options>`
-          inputs.omnisearch-flake.nixosModules.default
+  ## This exposes pkgs and options
+  imports = [ inputs.omnisearch-flake.nixosModules.default ];
 
-          {
-            services.omnisearch = {
-              enable = true; # enables the service-module (else ignores all other)
+  config = {
+    services.omnisearch = {
+      enable = true;
 
-              # systemd.enable = true; #default
+      ## enables systemd-service (default: true)
+      #systemd.enable = false;
 
-              settings = {
-                # omnisearch settings for **config.ini** here
-              };
-            };
-          }
-        ];
-
-        # ... config
+      ## Will be applied to omnisearch's config.ini
+      settings = {
+        # ... settings here ...
       };
-
-    # ... other output-stuff
     };
+  };
 }
 ```
 

@@ -10,32 +10,34 @@
   };
 
   outputs =
-    inputs@{ self
-    , nixpkgs
+    inputs@{ nixpkgs
     , flake-parts
     , ...
     }:
-    flake-parts.lib.mkFlake { inherit inputs; } {
-      systems = [
-        "x86_64-linux"
-        #NOTE: need testing for other systems
-      ];
+    flake-parts.lib.mkFlake { inherit inputs; } (
+      { self, ... }:
+      {
+        systems = [
+          "x86_64-linux"
+          #NOTE: need testing for other systems
+        ];
 
-      perSystem =
-        { pkgs, self', ... }:
-        {
-          packages.omnisearch = pkgs.callPackage ./packages/omnisearch.nix { };
-          packages.default = self'.packages.omnisearch;
+        perSystem =
+          { pkgs, self', ... }:
+          {
+            packages.omnisearch = pkgs.callPackage ./packages/omnisearch.nix { };
+            packages.default = self'.packages.omnisearch;
 
-          formatter = pkgs.nixpkgs-fmt;
+            formatter = pkgs.nixpkgs-fmt;
+          };
+
+        flake.overlays = { self', ... }: {
+          default = final: prev: {
+            omnisearch = self'.packages.default;
+          };
         };
 
-      flake.overlays = { self', ... }: {
-        default = final: prev: {
-          omnisearch = self'.packages.default;
-        };
-      };
-
-      flake.nixosModules.default = import ./modules/default.nix;
-    };
+        flake.nixosModules.default = import ./modules/default.nix;
+      }
+    );
 }
