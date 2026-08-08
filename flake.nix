@@ -19,9 +19,11 @@
       ];
 
       perSystem =
-        { pkgs, ... }:
+        { pkgs, self', ... }:
         {
-          packages.default = pkgs.callPackage ./pkgs/omnisearch.nix { };
+          packages.omnisearch = pkgs.callPackage ./pkgs/omnisearch.nix { };
+          packages.default = self'.packages.omnisearch;
+
           formatter = pkgs.nixpkgs-fmt;
         };
 
@@ -45,10 +47,17 @@
           nixpkgs.overlays = [ self.overlays.default ];
           options.services.omnisearch = {
             enable = lib.mkEnableOption "omnisearch";
+
             package = lib.mkOption {
               type = types.nullOr types.package;
               default = pkgs.omnisearch;
               description = "omnisearch package to use.";
+            };
+
+            #TODO:
+            systemd = {
+              enable = lib.mkEnableOption "Whether to enable omnisearch systemd-service";
+              # targets = [];
             };
           };
 

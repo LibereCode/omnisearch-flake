@@ -1,6 +1,6 @@
 # omnisearch.nix
 
-~A fork of~ A nix-wrapper off [omnisearch](https://git.bwaaa.monster/omnisearch/about/)
+~A fork off~ _A nix-wrapper_ off [omnisearch](https://git.bwaaa.monster/omnisearch/about/)
 **THAT ABSOLUTELY DO NOT BREAK THE LICENSE**, (i have made no changes to the source).
 
 I have also a better nix implementation either way... :P
