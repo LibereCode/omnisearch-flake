@@ -1,14 +1,16 @@
-{ stdenv
-, libxml2
-, curl
-, openssl
-, git
-, lib
-,
+{
+  stdenv,
+  libxml2,
+  curl,
+  openssl,
+  git,
+  lib,
+  bashNonInteractive,
 }:
 let
   inherit (lib) platforms;
   inherit (builtins) fetchurl;
+  bash = "${bashNonInteractive}/bin/bash";
 
   pname = "omnisearch";
   gitHostURL = "https://git.bwaaa.monster";
@@ -90,8 +92,10 @@ let
   #XXX: A hack, but it works...
   omnisearchRun = # sh
     ''
+      #!${bash}
       cd $out/share/omnisearch
-      ../../bin/omnisearch & disown
+      # ../../bin/omnisearch & disown
+      ./omnisearch & disown
     '';
 in
 stdenv.mkDerivation rec {
@@ -134,7 +138,8 @@ stdenv.mkDerivation rec {
   installPhase = ''
     mkdir -p $out/{bin,share/omnisearch} # ,share/systemd/system
 
-    install -Dm755 bin/omnisearch $out/bin/omnisearch
+    # install -Dm755 bin/omnisearch $out/bin/omnisearch
+    install -Dm755 bin/omnisearch $out/share/omnisearch/omnisearch
     cp -r $src/{templates,static,locales} -t $out/share/omnisearch/
     install -Dm644 example-config.ini $out/share/omnisearch/config.ini
 
