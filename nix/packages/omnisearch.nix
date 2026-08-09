@@ -1,13 +1,13 @@
-{ stdenv
-, libxml2
-, curl
-, openssl
-, git
-, lib
-, bashNonInteractive
-, ## used in pkgs.omnisearch.overrides {};
-  configINIOverrides ? { }
-, # configINIExtra ? "", # prolly dumb
+{
+  stdenv,
+  libxml2,
+  curl,
+  openssl,
+  git,
+  lib,
+  bashNonInteractive,
+  ## used in pkgs.omnisearch.overrides {};
+  configINIOverrides ? { }, # configINIExtra ? "", # prolly dumb
 }:
 let
   inherit (lib) platforms;
@@ -56,27 +56,27 @@ let
         #locale = "en_gb";
       };
       proxy = {
-        ## single proxy, or ...
-        proxy = null; # ''"socks5://127.0.0.1:9050"'';
+        ## single proxy, or ... (default: )
+        # proxy = ''"socks5://127.0.0.1:9050"'';
 
-        ## ... a proxy file (path as a string, do not source it)
-        list_file = null; # path/to/file;
+        ## ... a proxy file (path as a string, do not source it) (default: )
+        # list_file = path/to/file;
 
-        max_retries = 3;
+        #max_retries = 3;
 
         ## Randomize proxy credentials for each request
-        randomize_username = true;
-        randomize_password = true;
+        #randomize_username = true;
+        #randomize_password = true;
       };
       cache = {
-        ## Directory to store cached responses
-        dir = "/var/cache/omnisearch"; # "/tmp/omnisearch_cache";
+        ## Directory to store cached responses (default: "/tmp/omnisearch_cache";)
+        #dir = "/var/cache/omnisearch";
 
         ## Cache TTL for search results in seconds (default: 3600 = 1 hour)
-        ttl_search = 3600;
+        #ttl_search = 3600;
 
         ## Cache TTL for infobox data in seconds (default: 86400 = 24 hours)
-        ttl_infobox = 86400;
+        #ttl_infobox = 86400;
       };
       engines = {
         ## Use * for all engines, or specify comma-separated list (e.g., ddg,yahoo)
