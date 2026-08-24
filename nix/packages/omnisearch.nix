@@ -184,11 +184,6 @@ stdenv.mkDerivation rec {
   meta = {
     description = "Lightweight metasearch engine in C";
     platforms = platforms.linux;
-    license = {
-      fullName = "Omnisearch license";
-      shortName = "omnisearch";
-      url = "${gitHostURL}/${pname}/plain/LICENSE";
-      free = false; # I think not allowing to publish changes => unfree ?
-    };
+    license = lib.licenses.gpl2Plus;
   };
 }
