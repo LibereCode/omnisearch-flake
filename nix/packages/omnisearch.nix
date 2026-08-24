@@ -13,16 +13,13 @@ let
   inherit (lib) platforms;
   inherit (lib.generators) toINI;
 
-  pname = "omnisearch";
-  version = "2026.08.16";
   gitHostURL = "https://git.bwaaa.monster";
-  omnisearchRepoURL = "${gitHostURL}/omnisearch";
 
-  beaker = stdenv.mkDerivation {
+  beaker = stdenv.mkDerivation rec {
     pname = "beaker";
     version = "2026.06.02"; # TODO newer version
     src = fetchGit {
-      url = "${gitHostURL}/beaker";
+      url = "${gitHostURL}/${pname}";
       rev = "360d6271e1a20d128430e52637d5d35f4c706ca5";
     };
     makeFlags = [
@@ -87,11 +84,10 @@ let
   );
 
   omnisearchGitRev = "499bb9b1268cd422619efdc46889960425462aae";
-
 in
 stdenv.mkDerivation rec {
-  inherit pname;
-  inherit version;
+  pname = "omnisearch";
+  version = "2026.08.16";
 
   src = fetchGit {
     url = "${gitHostURL}/${pname}";
@@ -120,7 +116,7 @@ stdenv.mkDerivation rec {
     "GIT_HASH=${omnisearchGitRev}"
     "GIT_DATE=${version}" # TEST:
     "GIT_BRANCH=master"
-    "GIT_REMOTE=${omnisearchRepoURL}"
+    "GIT_REMOTE=${gitHostURL}/${pname}"
   ];
 
   preBuild = ''
@@ -191,7 +187,7 @@ stdenv.mkDerivation rec {
     license = {
       fullName = "Omnisearch license";
       shortName = "omnisearch";
-      url = "${omnisearchRepoURL}/plain/LICENSE";
+      url = "${gitHostURL}/${pname}/plain/LICENSE";
       free = false; # I think not allowing to publish changes => unfree ?
     };
   };
