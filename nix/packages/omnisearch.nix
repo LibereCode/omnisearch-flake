@@ -11,38 +11,25 @@
 }:
 let
   inherit (lib) platforms;
-  inherit (builtins) fetchurl;
-  bash = "${bashNonInteractive}/bin/bash";
   inherit (lib.generators) toINI;
 
   pname = "omnisearch";
+  version = "2026.08.16";
   gitHostURL = "https://git.bwaaa.monster";
   omnisearchRepoURL = "${gitHostURL}/omnisearch";
-  unChangeLICENSE = fetchurl {
-    url = "${omnisearchRepoURL}/plain/LICENSE";
-    sha256 = "1i86m5vk5na9ya6hcci4z1p9riizls1fanpb9z5l810qm1i7062q";
-  };
 
-  beaker = stdenv.mkDerivation rec {
-    name = "${pname}-${version}";
+  beaker = stdenv.mkDerivation {
     pname = "beaker";
-    version = "360d627";
-
+    version = "2026.06.02"; # TODO newer version
     src = fetchGit {
       url = "${gitHostURL}/beaker";
-      rev = "${version}1e1a20d128430e52637d5d35f4c706ca5";
+      rev = "360d6271e1a20d128430e52637d5d35f4c706ca5";
     };
-
-    buildPhase = /* sh */ ''
-      make
-    '';
-    installPhase = /* sh */ ''
-      make INSTALL_PREFIX="$out/" install
-    '';
     makeFlags = [
       "INSTALL_PREFIX=$(out)/"
       "LDCONFIG=true"
     ];
+    meta.license = lib.licenses.lgpl21Only;
   };
 
   #INFO: These are default values + few overrides from example-config.ini.
@@ -99,77 +86,113 @@ let
     // configINIOverrides
   );
 
-  #XXX: A hack, but it works...
-  omnisearchRun = # sh
-    ''
-      #!${bash}
-      cd $out/share/omnisearch
-      # ../../bin/omnisearch & disown
-      ./omnisearch & disown
-    '';
+  omnisearchGitRev = "499bb9b1268cd422619efdc46889960425462aae";
+
 in
 stdenv.mkDerivation rec {
-  name = "${pname}-${version}";
   inherit pname;
-  version = "499bb9b";
+  inherit version;
 
   src = fetchGit {
     url = "${gitHostURL}/${pname}";
-    rev = "${version}1268cd422619efdc46889960425462aae";
+    rev = omnisearchGitRev;
   };
 
+  nativeBuildInputs = [
+    git
+  ];
   buildInputs = [
     libxml2
     curl
     openssl
     beaker
-    git
   ];
+
+  makeFlags = [
+    "PREFIX=$(out)"
+    "INSTALL_BIN_DIR=$(out)/bin"
+    "DATA_DIR=$(out)/share/omnisearch"
+    "LOG_DIR=$(out)/var/log/omnisearch"
+    "CACHE_DIR=$(out)/var/cache/omnisearch"
+    "VAR_DIR=$(out)/var/lib/omnisearch"
+    "SYSTEMD_DIR=$(out)/lib/systemd/system"
+
+    "GIT_HASH=${omnisearchGitRev}"
+    "GIT_DATE=${version}" # TEST:
+    "GIT_BRANCH=master"
+    "GIT_REMOTE=${omnisearchRepoURL}"
+  ];
+
   preBuild = ''
     makeFlagsArray+=(
-      GIT_HASH="$(git -C $src rev-parse --short ${version})"
-      GIT_DATE="$(git -C $src log -1 --format='%ad' --date='format:%y.%m.%d')"
-      GIT_BRANCH="$(git -C $src rev-parse --abbrev-ref ${version})"
-      GIT_REMOTE="$(git -C $src remote get-url origin)"
+      CFLAGS="-Wall -Wextra -O2 -Isrc -I${libxml2.dev}/include/libxml2"
+      LIBS="-lbeaker -lcurl -lxml2 -lpthread -lm -lssl -lcrypto"
     )
   '';
-  buildPhase = # sh
-    ''
-      #NOTE: I don't understand why I cant put everything in makeFlagArray...
-      make \
-        PREFIX="$out" \
-        CFLAGS="-Wall -Wextra -O2 -Isrc -I${libxml2.dev}/include/libxml2" \
-        LIBS="-lbeaker -lcurl -lxml2 -lpthread -lm -lssl -lcrypto" \
-        ''${makeFlagsArray[@]}
-
-      #TODO: HOLY SHIT WORKS! Just systemd left.
-      # will do it manually?
-    '';
 
   installPhase = ''
     mkdir -p $out/{bin,share/omnisearch} # ,share/systemd/system
 
-    # install -Dm755 bin/omnisearch $out/bin/omnisearch
-    install -Dm755 bin/omnisearch $out/share/omnisearch/omnisearch
-    cp -r $src/{templates,static,locales} -t $out/share/omnisearch/
+    #WARN: will fail because it uses `useradd` and `groupadd`. Instead do it manually
+    # make install-systemd "''${makeFlagsArray[@]}"
+    data_dir=$out/share/omnisearch
+    mkdir -p $data_dir/{templates,static,locales}
+    mkdir -p $out/var/{log,cache}/omnisearch
+    mkdir -p $out/lib/systemd/system
+    cp -rf templates/* $data_dir/templates/
+    cp -rf static/* $data_dir/static/
+    cp -rf locales/* $data_dir/locales/
+    ## TODO if ini-file was generated, then replace with it, else keep example
+    # cp -n example-config.ini $data_dir/config.ini || true
+    cp -n example-config.ini $data_dir/ || true
+    install -m755 bin/omnisearch $out/bin/omnisearch
+    sed -i \
+      -e "s|^WorkingDirectory=.*|WorkingDirectory=$data_dir|" \
+      -e "s|^ExecStart=.*|ExecStart=$out/bin/omnisearch|" \
+      init/systemd/omnisearch.service
+    install -m644 init/systemd/omnisearch.service $out/lib/systemd/system/omnisearch.service
+    echo ""
+    echo "Config: $data_dir/config.ini"
+    echo "Edit config with: alias nano=vim; nano $data_dir/config.ini"
+    echo "Installed systemd service to $out/lib/systemd/system/omnisearch.service"
+    echo "Run 'systemctl enable --now omnisearch' to start"
+    echo ""
+    echo "Well, for NixOS you have to add the package to:"
+    echo "<config.environment.systemPackages> and to <config.systemd.packages>"
+    echo "... and you need to also add user+group 'omnisearch'"
+    echo ""
 
-    cat << EOF > omnisearch-run.sh
-    ${omnisearchRun}
-    EOF
+    #TEST:
+    ln -s $out/bin/omnisearch $out/share/omnisearch/omnisearch
+
+    #TEST:
+    echo \
+    "#!${bashNonInteractive}/bin/bash
+    cd $out/share/omnisearch || exit
+    # ../../bin/omnisearch & disown
+    ./omnisearch & disown" \
+    > omnisearch-run.sh
+
     install -Dm755 omnisearch-run.sh $out/bin/omnisearch-run
 
-    cat << EOF > generated-config.ini
+    echo '
     ${configINI}
-    EOF
+    ' > generated-config.ini
+
     install -Dm644 generated-config.ini $out/share/omnisearch/config.ini
 
-    #TEST: temp
-    cp -r $src/ $out/temp-src
   '';
+  # # NOTE TEMPORARY
+  # cp -r $src/ $out/temp-src
 
   meta = {
     description = "Lightweight metasearch engine in C";
     platforms = platforms.linux;
-    license = [ unChangeLICENSE ];
+    license = {
+      fullName = "Omnisearch license";
+      shortName = "omnisearch";
+      url = "${omnisearchRepoURL}/plain/LICENSE";
+      free = false; # I think not allowing to publish changes => unfree ?
+    };
   };
 }

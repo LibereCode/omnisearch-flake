@@ -1,12 +1,21 @@
 # omnisearch.nix
 
+> [!WARNING]
+> The **package** works (on my machine at least), but
+> **THE SERVICE DEFINENTLY DO NOT WORK!**
+> Also, my package is kind of shit (as in bloated) at the moment...
+
+## ABOUT
+
 ~A fork off~ _A nix-wrapper_ off [omnisearch](https://git.bwaaa.monster/omnisearch/about/)
 **THAT ABSOLUTELY DO NOT BREAK THE LICENSE**, (i have made no changes to the source).
 
 I have also a better nix implementation either way... :P
 
-> [!WARN]
-> `services.omnisearch` does NOT work yet, so just use the package for now...
+> [!NOTE]
+> USE `pkgs.thunar` as a reference.
+> [See the sauce here](https://github.com/NixOS/nixpkgs/blob/nixos-26.05/pkgs/by-name/th/thunar-unwrapped/package.nix#L105)
+
 
 ## USAGE
 
