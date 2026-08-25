@@ -28,7 +28,7 @@
       options.services.omnisearch = {
         enable = mkEnableOption (literalMD "`omnisearch`");
 
-        package = lib.mkPackageOption pkgs "omnisearch" {
+        package = mkPackageOption pkgs "omnisearch" {
           default = pkg;
         };
 
