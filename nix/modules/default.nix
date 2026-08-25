@@ -127,9 +127,9 @@
                 "${srcDir}/config.ini:${cfg.dataDir}/config.ini"
               ];
 
-              # DynamicUser = true;
-              # ProtectSystem = "strict";
-              # ProtectHome = true;
+              DynamicUser = true;
+              ProtectSystem = "strict";
+              ProtectHome = true;
               # PrivateTmp = true;
               # NoNewPrivileges = true;
 
