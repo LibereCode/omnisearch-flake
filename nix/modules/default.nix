@@ -32,7 +32,7 @@
         };
 
         settings = mkOption {
-          inherit iniType;
+          type = iniType;
           default = { };
           description = literalMD ''
             AttrSet that will be converted into **dosini**-format
