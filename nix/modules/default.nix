@@ -130,7 +130,7 @@
               DynamicUser = true;
               ProtectSystem = "strict";
               ProtectHome = true;
-              # PrivateTmp = true;
+              PrivateTmp = true;
               # NoNewPrivileges = true;
 
               Restart = "always";
