@@ -15,7 +15,6 @@
       inherit (lib)
         literalMD
         mkOption
-        mkPackageOption
         mkEnableOption
         mkIf
         optionals
@@ -27,8 +26,10 @@
       options.services.omnisearch = {
         enable = mkEnableOption (literalMD "`omnisearch`");
 
-        package = mkPackageOption pkgs "omnisearch" {
+        package = mkOption {
+          type = types.nullOr types.package;
           default = pkg;
+          description = literalMD "`omnisearch` **package** to use.";
         };
 
         settings = mkOption {
