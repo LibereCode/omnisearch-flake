@@ -56,9 +56,10 @@
         # nixpkgs.overlays = [ self'.overlays.default ];
 
         environment.systemPackages = optionals (cfg.package != null) [
-          (cfg.package.overrides { configINIOverrides = cfg.settings; })
+          (cfg.package.override { configINIOverrides = cfg.settings; })
         ];
 
+        #TODO: Fix with user and group
         # A lot of this come from OG omnisearch-systemd-nix-implementation.
         systemd.services.omnisearch =
           let
