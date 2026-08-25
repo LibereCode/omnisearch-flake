@@ -131,7 +131,7 @@
               ProtectSystem = "strict";
               ProtectHome = true;
               PrivateTmp = true;
-              # NoNewPrivileges = true;
+              NoNewPrivileges = true;
 
               Restart = "always";
               RestartSec = 5;
