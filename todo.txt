@@ -1,0 +1,2 @@
+(B) 2026-08-25 Move +builder.ini to the +service and have the +package just take an optional string @package @module
+(D) 2026-08-25 Allow adding custom +theme.css file to the +package @package
