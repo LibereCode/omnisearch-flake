@@ -3,6 +3,7 @@
   imports = [
     ./experiments
     ./packages
+    ./modules
   ];
 
   systems = [

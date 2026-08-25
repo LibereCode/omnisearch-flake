@@ -1,28 +1,21 @@
-{
-  inputs,
-  self,
-  ...
-}:
+{ inputs, self, ... }:
 {
   flake.nixosModules.default =
     per@{
       config,
       lib,
       pkgs,
-      self',
       ...
     }:
     let
       cfg = config.services.omnisearch;
       # pkg = pkgs.omnisearch;
-      pkg = self'.packages.omnisearch;
-      iniType = pkgs.formats.ini.type;
+      pkg = self.packages.${pkgs.stdenv.hostPlatform.system}.omnisearch;
       inherit (lib)
         literalMD
         mkOption
         mkEnableOption
         mkIf
-        optionals
         types
         ;
     in
@@ -32,13 +25,13 @@
         enable = mkEnableOption (literalMD "`omnisearch`");
 
         package = mkOption {
-          type = types.nullOr types.package;
+          type = types.package;
           default = pkg;
           description = literalMD "`omnisearch` **package** to use.";
         };
 
         settings = mkOption {
-          inherit iniType;
+          type = pkgs.formats.ini.type;
           default = { };
           description = literalMD ''
             AttrSet that will be converted into **dosini**-format
@@ -60,10 +53,12 @@
       config = mkIf cfg.enable {
         # nixpkgs.overlays = [ self'.overlays.default ];
 
-        environment.systemPackages = optionals (cfg.package != null) [
-          (cfg.package.overrides { configINIOverrides = cfg.settings; })
+        environment.systemPackages = [
+          # (cfg.package.override { configINIOverrides = cfg.settings; })
+          cfg.package
         ];
 
+        #TODO: Fix with user and group
         # A lot of this come from OG omnisearch-systemd-nix-implementation.
         systemd.services.omnisearch =
           let

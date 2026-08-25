@@ -29,59 +29,58 @@ let
     meta.license = lib.licenses.lgpl21Only;
   };
 
+  configINIAttrs = {
+    server = {
+      host = "0.0.0.0";
+      port = 8087;
+      ## default locale (default: "en_gb")
+      #locale = "en_gb";
+    };
+    proxy = {
+      ## single proxy, or ... (default: )
+      # proxy = ''"socks5://127.0.0.1:9050"'';
+
+      ## ... a proxy file (path as a string, do not source it) (default: )
+      # list_file = path/to/file;
+
+      #max_retries = 3;
+
+      ## Randomize proxy credentials for each request
+      #randomize_username = true;
+      #randomize_password = true;
+    };
+    cache = {
+      ## Directory to store cached responses (default: "/tmp/omnisearch_cache";)
+      #dir = "/var/cache/omnisearch";
+
+      ## Cache TTL for search results in seconds (default: 3600 = 1 hour)
+      #ttl_search = 3600;
+
+      ## Cache TTL for infobox data in seconds (default: 86400 = 24 hours)
+      #ttl_infobox = 86400;
+    };
+    engines = {
+      ## Use * for all engines, or specify comma-separated list (e.g., ddg,yahoo)
+      ## Use *,-engine to exclude specific engines (e.g., *,-startpage)
+      ## Available engines: ddg, startpage, yahoo, mojeek
+      engines = ''"*"'';
+    };
+    rate_limit = {
+      ## Rate limit searches per interval
+
+      ## /search
+      #search_requests = 10;
+      #search_interval = 60;
+
+      ## /images
+      #images_requests = 20;
+      #images_interval = 60;
+    };
+  }
+  // configINIOverrides;
   #INFO: These are default values + few overrides from example-config.ini.
   ## Just use .override if you want to change
-  configINI = toINI { } (
-    {
-      server = {
-        host = "0.0.0.0";
-        port = 8087;
-        ## default locale (default: "en_gb")
-        #locale = "en_gb";
-      };
-      proxy = {
-        ## single proxy, or ... (default: )
-        # proxy = ''"socks5://127.0.0.1:9050"'';
-
-        ## ... a proxy file (path as a string, do not source it) (default: )
-        # list_file = path/to/file;
-
-        #max_retries = 3;
-
-        ## Randomize proxy credentials for each request
-        #randomize_username = true;
-        #randomize_password = true;
-      };
-      cache = {
-        ## Directory to store cached responses (default: "/tmp/omnisearch_cache";)
-        #dir = "/var/cache/omnisearch";
-
-        ## Cache TTL for search results in seconds (default: 3600 = 1 hour)
-        #ttl_search = 3600;
-
-        ## Cache TTL for infobox data in seconds (default: 86400 = 24 hours)
-        #ttl_infobox = 86400;
-      };
-      engines = {
-        ## Use * for all engines, or specify comma-separated list (e.g., ddg,yahoo)
-        ## Use *,-engine to exclude specific engines (e.g., *,-startpage)
-        ## Available engines: ddg, startpage, yahoo, mojeek
-        engines = ''"*"'';
-      };
-      rate_limit = {
-        ## Rate limit searches per interval
-
-        ## /search
-        #search_requests = 10;
-        #search_interval = 60;
-
-        ## /images
-        #images_requests = 20;
-        #images_interval = 60;
-      };
-    }
-    // configINIOverrides
-  );
+  configINI = lib.generators.toINI { } configINIAttrs;
 
   omnisearchGitRev = "499bb9b1268cd422619efdc46889960425462aae";
 in
@@ -142,23 +141,7 @@ stdenv.mkDerivation rec {
     # cp -n example-config.ini $data_dir/config.ini || true
     cp -n example-config.ini $data_dir/ || true
     install -m755 bin/omnisearch $out/bin/omnisearch
-    sed -i \
-      -e "s|^WorkingDirectory=.*|WorkingDirectory=$data_dir|" \
-      -e "s|^ExecStart=.*|ExecStart=$out/bin/omnisearch|" \
-      init/systemd/omnisearch.service
-    install -m644 init/systemd/omnisearch.service $out/lib/systemd/system/omnisearch.service
-    echo ""
-    echo "Config: $data_dir/config.ini"
-    echo "Edit config with: alias nano=vim; nano $data_dir/config.ini"
-    echo "Installed systemd service to $out/lib/systemd/system/omnisearch.service"
-    echo "Run 'systemctl enable --now omnisearch' to start"
-    echo ""
-    echo "Well, for NixOS you have to add the package to:"
-    echo "<config.environment.systemPackages> and to <config.systemd.packages>"
-    echo "... and you need to also add user+group 'omnisearch'"
-    echo ""
 
-    #TEST:
     ln -s $out/bin/omnisearch $out/share/omnisearch/omnisearch
 
     #TEST:
