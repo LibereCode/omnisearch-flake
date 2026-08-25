@@ -5,13 +5,12 @@
       config,
       lib,
       pkgs,
-      self',
       ...
     }:
     let
       cfg = config.services.omnisearch;
       # pkg = pkgs.omnisearch;
-      pkg = self'.packages.omnisearch;
+      pkg = self.packages.${pkgs.stdenv.hostPlatform.system}.omnisearch;
       iniType = pkgs.formats.ini.type;
       inherit (lib)
         literalMD
