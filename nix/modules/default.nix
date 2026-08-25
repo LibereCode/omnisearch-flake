@@ -92,6 +92,7 @@
 
         users = {
           users.${cfg.user} = {
+            isSystemUser = true;
             group = cfg.group;
             home = cfg.dataDir;
             createHome = true;
