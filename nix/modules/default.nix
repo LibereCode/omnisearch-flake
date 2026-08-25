@@ -114,9 +114,11 @@
               User = cfg.user;
               Group = cfg.group;
 
-              ExecStart = "${srcDir}/omnisearch";
+              # ExecStart = "${srcDir}/omnisearch";
 
               WorkingDirectory = cfg.dataDir;
+              StateDirectory = "omnisearch"; # sus?
+              CacheDirectory = "omnisearch"; # sus?
 
               BindReadOnlyPaths = [
                 "${srcDir}/templates:${cfg.dataDir}/templates"
@@ -125,11 +127,11 @@
                 "${srcDir}/config.ini:${cfg.dataDir}/config.ini"
               ];
 
-              DynamicUser = true;
-              ProtectSystem = "strict";
-              ProtectHome = true;
-              PrivateTmp = true;
-              NoNewPrivileges = true;
+              # DynamicUser = true;
+              # ProtectSystem = "strict";
+              # ProtectHome = true;
+              # PrivateTmp = true;
+              # NoNewPrivileges = true;
 
               Restart = "always";
               RestartSec = 5;
