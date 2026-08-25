@@ -114,7 +114,7 @@
               User = cfg.user;
               Group = cfg.group;
 
-              # ExecStart = "${srcDir}/omnisearch";
+              ExecStart = "${srcDir}/omnisearch";
 
               WorkingDirectory = cfg.dataDir;
               StateDirectory = "omnisearch"; # sus?
