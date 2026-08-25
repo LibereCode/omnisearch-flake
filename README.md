@@ -2,15 +2,21 @@
 
 > [!WARNING]
 > The **package** works (on my machine at least), but
-> **THE SERVICE DEFINENTLY DO NOT WORK!**
-> Also, my package is kind of shit (as in bloated) at the moment...
+> ~**THE SERVICE DEFINENTLY DO NOT WORK!**
+> Also, my package is kind of shit (as in bloated) at the moment...~
+
+```note
+  THE SERVICE NOW WORKS !!
+  Well... kind of... you cant use the configure option of the service... BUT
+  the systemd service now works, and it creates `omnisearch` user/group and
+  they run the service.
+```
 
 ## ABOUT
 
 > [!NOTE]
 > USE `pkgs.thunar` as a reference.
 > [See the sauce here](https://github.com/NixOS/nixpkgs/blob/nixos-26.05/pkgs/by-name/th/thunar-unwrapped/package.nix#L105)
-
 
 ## USAGE
 
