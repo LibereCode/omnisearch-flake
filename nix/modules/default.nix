@@ -1,8 +1,4 @@
-{
-  inputs,
-  self,
-  ...
-}:
+{ inputs, self, ... }:
 {
   flake.nixosModules.default =
     per@{
@@ -20,6 +16,7 @@
       inherit (lib)
         literalMD
         mkOption
+        mkPackageOption
         mkEnableOption
         mkIf
         optionals
@@ -31,10 +28,8 @@
       options.services.omnisearch = {
         enable = mkEnableOption (literalMD "`omnisearch`");
 
-        package = mkOption {
-          type = types.nullOr types.package;
+        package = lib.mkPackageOption pkgs "omnisearch" {
           default = pkg;
-          description = literalMD "`omnisearch` **package** to use.";
         };
 
         settings = mkOption {

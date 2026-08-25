@@ -142,23 +142,7 @@ stdenv.mkDerivation rec {
     # cp -n example-config.ini $data_dir/config.ini || true
     cp -n example-config.ini $data_dir/ || true
     install -m755 bin/omnisearch $out/bin/omnisearch
-    sed -i \
-      -e "s|^WorkingDirectory=.*|WorkingDirectory=$data_dir|" \
-      -e "s|^ExecStart=.*|ExecStart=$out/bin/omnisearch|" \
-      init/systemd/omnisearch.service
-    install -m644 init/systemd/omnisearch.service $out/lib/systemd/system/omnisearch.service
-    echo ""
-    echo "Config: $data_dir/config.ini"
-    echo "Edit config with: alias nano=vim; nano $data_dir/config.ini"
-    echo "Installed systemd service to $out/lib/systemd/system/omnisearch.service"
-    echo "Run 'systemctl enable --now omnisearch' to start"
-    echo ""
-    echo "Well, for NixOS you have to add the package to:"
-    echo "<config.environment.systemPackages> and to <config.systemd.packages>"
-    echo "... and you need to also add user+group 'omnisearch'"
-    echo ""
 
-    #TEST:
     ln -s $out/bin/omnisearch $out/share/omnisearch/omnisearch
 
     #TEST:
