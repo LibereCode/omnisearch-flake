@@ -54,7 +54,8 @@
         # nixpkgs.overlays = [ self'.overlays.default ];
 
         environment.systemPackages = [
-          (cfg.package.override { configINIOverrides = cfg.settings; })
+          # (cfg.package.override { configINIOverrides = cfg.settings; })
+          cfg.package
         ];
 
         #TODO: Fix with user and group
