@@ -11,13 +11,11 @@
       cfg = config.services.omnisearch;
       # pkg = pkgs.omnisearch;
       pkg = self.packages.${pkgs.stdenv.hostPlatform.system}.omnisearch;
-      iniType = pkgs.formats.ini.type;
       inherit (lib)
         literalMD
         mkOption
         mkEnableOption
         mkIf
-        optionals
         types
         ;
     in
@@ -27,13 +25,13 @@
         enable = mkEnableOption (literalMD "`omnisearch`");
 
         package = mkOption {
-          type = types.nullOr types.package;
+          type = types.package;
           default = pkg;
           description = literalMD "`omnisearch` **package** to use.";
         };
 
         settings = mkOption {
-          type = iniType;
+          type = pkgs.formats.ini.type;
           default = { };
           description = literalMD ''
             AttrSet that will be converted into **dosini**-format
@@ -55,7 +53,7 @@
       config = mkIf cfg.enable {
         # nixpkgs.overlays = [ self'.overlays.default ];
 
-        environment.systemPackages = optionals (cfg.package != null) [
+        environment.systemPackages = [
           (cfg.package.override { configINIOverrides = cfg.settings; })
         ];
 
