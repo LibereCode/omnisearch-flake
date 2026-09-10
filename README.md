@@ -65,7 +65,7 @@
 
 ## ALTERNATIVES
 
-I just discovered there also exist [another omnisearch nix-flake](https://github.com/JetHair/OmniSearch).
+I just discovered there also exist [another omnisearch nix-flake](https://git.alovely.space/Nyx/OmniSearch).
 It is a bit older, but is maybe better; I dunno 🤷.
 
 ## LICENSE
