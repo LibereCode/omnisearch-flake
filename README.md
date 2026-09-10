@@ -1,10 +1,5 @@
 # omnisearch.nix
 
-> [!WARNING]
-> The **package** works (on my machine at least), but
-> ~**THE SERVICE DEFINENTLY DO NOT WORK!**
-> Also, my package is kind of shit (as in bloated) at the moment...~
-
 > [!NOTE]
 > THE SERVICE NOW WORKS !!
 > Well... kind of... you cant use the configure option of the service... BUT
