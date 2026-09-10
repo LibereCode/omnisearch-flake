@@ -5,12 +5,11 @@
 > ~**THE SERVICE DEFINENTLY DO NOT WORK!**
 > Also, my package is kind of shit (as in bloated) at the moment...~
 
-```note
-  THE SERVICE NOW WORKS !!
-  Well... kind of... you cant use the configure option of the service... BUT
-  the systemd service now works, and it creates `omnisearch` user/group and
-  they run the service.
-```
+> [!NOTE]
+> THE SERVICE NOW WORKS !!
+> Well... kind of... you cant use the configure option of the service... BUT
+> the systemd service now works, and it creates `omnisearch` user/group and
+> they run the service.
 
 ## ABOUT
 
@@ -63,6 +62,11 @@
   };
 }
 ```
+
+## ALTERNATIVES
+
+I just discovered there also exist [another omnisearch nix-flake](https://github.com/JetHair/OmniSearch).
+It is a bit older, but is maybe better; I dunno 🤷.
 
 ## LICENSE
 
